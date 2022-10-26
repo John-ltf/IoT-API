@@ -49,8 +49,6 @@ jobs:
       - name: Test
         run: |
             ls D:\a\IoT-api\IoT-api
-            ls C:\local\Temp\zipdeploy
-            ls C:\local\Temp\zipdeploy\extracted
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
