@@ -46,6 +46,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: .net-app
+      - name: Test
+        run: |
+            ls -ltr D:\a\IoT-api\IoT-api
+            ls -ltr C:\local\Temp\zipdeploy
+            ls -ltr C:\local\Temp\zipdeploy\extracted
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
