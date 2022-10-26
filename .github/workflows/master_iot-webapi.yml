@@ -46,9 +46,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: .net-app
-      - name: Test
-        run: |
-            ls D:\a\IoT-api\IoT-api
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
