@@ -41,5 +41,18 @@ namespace IoT_API.Controllers
 
         [HttpPut("device/{deviceId}/status/{statusVal}")]
         public async Task<Boolean> updateDeviceStatus(string deviceId, string statusVal, [FromQuery(Name = "user")] string user) => await _iotHub.updateStatusDevice(deviceId, user, statusVal);
+
+
+        [HttpGet("GetAllHeaders")]
+        public ActionResult<Dictionary<string, string>> GetAllHeaders()
+        {
+            Dictionary<string, string> requestHeaders = new Dictionary<string, string>();
+            foreach (var header in Request.Headers)
+            {
+                requestHeaders.Add(header.Key, header.Value);
+            }
+            return requestHeaders;
+        }
+
     }
 }
