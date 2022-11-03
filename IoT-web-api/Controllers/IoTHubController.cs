@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using IoTLib;
 using IoTLib.Devices;
 using Microsoft.Azure.Devices;
+using System.Net;
 
 namespace IoT_API.Controllers
 {
@@ -17,16 +18,49 @@ namespace IoT_API.Controllers
         }
 
         [HttpGet("devices/list/")]
-        public async Task<ActionResult<List<IoTDeviceEntry>>> getUserDevicesList([FromQuery(Name = "user")]  string user) => await _iotHub.getUserDevicesList(user);
+        public async Task<ActionResult<List<IoTDeviceEntry>>> getUserDevicesList([FromQuery(Name = "user")]  string user)
+        {
+            if(Request.Headers["X-MS-CLIENT-PRINCIPAL-ID"] == user)
+            {
+                return await _iotHub.getUserDevicesList(user);
+            }
+            Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            return null;
+        }
 
         [HttpGet("devices/")]
-        public async Task<ActionResult<List<IoTDevice>>> getUserDevices([FromQuery(Name = "user")]  string user) => await _iotHub.getUserDevices(user);
+        public async Task<ActionResult<List<IoTDevice>>> getUserDevices([FromQuery(Name = "user")]  string user)
+        {
+            if(Request.Headers["X-MS-CLIENT-PRINCIPAL-ID"] == user)
+            {
+                return await _iotHub.getUserDevices(user);
+            }
+            Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            return null;
+        }
 
         [HttpGet("device/{deviceId}")]
-        public async Task<ActionResult<List<IoTDevice>>> getDevice(  string deviceId, [FromQuery(Name = "user")] string user) => await _iotHub.getDevice(deviceId, user);
+        public async Task<ActionResult<List<IoTDevice>>> getDevice(  string deviceId, [FromQuery(Name = "user")] string user)
+        {
+            if(Request.Headers["X-MS-CLIENT-PRINCIPAL-ID"] == user)
+            {
+                return await _iotHub.getDevice(deviceId, user);
+            }
+            Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            return null;
+        }
 
         [HttpPost("device/{deviceId}")]
-        public async Task<ActionResult<List<IoTDevice>>> newDevice(string deviceId, IoTDeviceProperties props) => await _iotHub.registerDevice(deviceId, props);
+        public async Task<ActionResult<List<IoTDevice>>> newDevice(string deviceId, IoTDeviceProperties props)
+        {
+            if(Request.Headers["X-MS-CLIENT-PRINCIPAL-ID"] == props.User)
+            {
+                return await _iotHub.registerDevice(deviceId, props);
+            }
+            Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            return null;
+
+        }
 
         [HttpPut("device/{deviceId}")]
         public async Task<ActionResult<List<IoTDevice>>> updateDevice(string deviceId,
@@ -34,25 +68,35 @@ namespace IoT_API.Controllers
                                                                         [FromQuery(Name = "updateType")] string updateType,
                                                                         [FromQuery(Name = "updateName")] string updateName,
                                                                         [FromQuery(Name = "updateValue")] string updateValue )
-                                                                        => await _iotHub.updateDevice(deviceId, user, updateType, updateName, updateValue);
-
-        [HttpDelete("device/{deviceId}")]
-        public Task<Boolean> deleteDevice(string deviceId, [FromQuery(Name = "user")] string user) => _iotHub.deleteDevice(deviceId, user);
-
-        [HttpPut("device/{deviceId}/status/{statusVal}")]
-        public async Task<Boolean> updateDeviceStatus(string deviceId, string statusVal, [FromQuery(Name = "user")] string user) => await _iotHub.updateStatusDevice(deviceId, user, statusVal);
-
-
-        [HttpGet("GetAllHeaders")]
-        public ActionResult<Dictionary<string, string>> GetAllHeaders()
         {
-            Dictionary<string, string> requestHeaders = new Dictionary<string, string>();
-            foreach (var header in Request.Headers)
+            if(Request.Headers["X-MS-CLIENT-PRINCIPAL-ID"] == user)
             {
-                requestHeaders.Add(header.Key, header.Value);
+                return await _iotHub.updateDevice(deviceId, user, updateType, updateName, updateValue);
             }
-            return requestHeaders;
+            Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            return null;
         }
 
+        [HttpDelete("device/{deviceId}")]
+        public Task<Boolean> deleteDevice(string deviceId, [FromQuery(Name = "user")] string user)
+        {
+            if(Request.Headers["X-MS-CLIENT-PRINCIPAL-ID"] == user)
+            {
+                return _iotHub.deleteDevice(deviceId, user);
+            }
+            Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            return null;
+        }
+
+        [HttpPut("device/{deviceId}/status/{statusVal}")]
+        public async Task<Boolean> updateDeviceStatus(string deviceId, string statusVal, [FromQuery(Name = "user")] string user)
+        {
+            if(Request.Headers["X-MS-CLIENT-PRINCIPAL-ID"] == user)
+            {
+                return await _iotHub.updateStatusDevice(deviceId, user, statusVal);
+            }
+            Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            return false;
+        }
     }
 }

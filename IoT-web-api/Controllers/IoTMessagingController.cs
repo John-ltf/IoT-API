@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using IoTLib;
+using System.Net;
 
 namespace IoT_API.Controllers
 {
@@ -15,6 +16,14 @@ namespace IoT_API.Controllers
         }
 
         [HttpPost("direct-method/{deviceId}/")]
-        public async Task<ActionResult<string>> newDevice(string deviceId, DeviceDirectMethod method) => await _iotServiceClient.sendDirectMethod(deviceId, method);
+        public async Task<ActionResult<string>> newDevice(string deviceId, DeviceDirectMethod method)
+        {
+            if(Request.Headers["X-MS-CLIENT-PRINCIPAL-ID"] == method.User)
+            {
+                return await _iotServiceClient.sendDirectMethod(deviceId, method);
+            }
+            Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            return null;
+        }
     }
 }

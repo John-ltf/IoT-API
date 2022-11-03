@@ -1,5 +1,5 @@
 dotnet new sln
-dotnet new webapi -n IoT-API
+dotnet new webapi -n IoT-web-api
 dotnet new classlib -n IoTLib
 dotnet sln add .\IoT-API\IoT-API.csproj
 dotnet sln add .\IoTLib\IoTLib.csproj
@@ -12,6 +12,7 @@ dotnet add package Microsoft.OpenApi
 dotnet add package Swashbuckle.AspNetCore.Swagger
 dotnet add package Swashbuckle.AspNetCore.SwaggerGen
 dotnet add package Swashbuckle.AspNetCore.SwaggerUI
+dotnet add package Microsoft.AspNet.WebApi.Client
 
 Set-Location -Path  ..\IoTLib
 dotnet add package Microsoft.Azure.Devices
